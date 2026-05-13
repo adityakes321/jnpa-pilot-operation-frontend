@@ -1,0 +1,12 @@
+.live-berthing-page .card {
+  border-radius: 0.75rem;
+}
+
+.live-berthing-page .table th {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.live-berthing-page .table td {
+  vertical-align: middle;
+}

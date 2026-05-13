@@ -1,0 +1,11 @@
+.vessel-name-page .card {
+  border-radius: 0.75rem;
+}
+
+.vessel-name-page .table th {
+  font-weight: 600;
+}
+
+.vessel-name-page .table tbody tr:nth-child(even) {
+  background-color: rgba(0, 0, 0, 0.02);
+}
