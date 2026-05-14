@@ -59,7 +59,7 @@
 }
 
 .berth-allocation-page .ag-header-row {
-  background-color: #4c3d3df8;
+  background-color: transparent !important;
   font-weight: 600;
   font-size: 1rem;
   text-align: center;
@@ -84,11 +84,22 @@
   align-items: center;
   cursor: pointer;
   font-weight: 700;
-  background-color: #1e3a8a;
+  background-color: transparent;
   color: #fff;
   padding-left: 8px;
   height: 100%;
   width: 100%;
+}
+
+.berth-allocation-page .ag-row-group {
+  background-color: #1e3a8a !important;
+  color: #ffffff !important;
+}
+
+.berth-allocation-page .ag-row-group .ag-cell {
+  background-color: transparent !important;
+  color: #ffffff !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
 .berth-allocation-page .group-header .expand-icon {
@@ -133,17 +144,15 @@
 }
 
 .berth-allocation-page .ag-theme-alpine .ag-header {
+  background-color: #4c3d3df8 !important;
   border-bottom: 2px solid #f5c938 !important;
 }
 
-.berth-allocation-page .ag-row-group .ag-cell:first-child {
-  border-right: 1px solid #dee2e6 !important;
-}
-
-.berth-allocation-page .ag-row-group .ag-cell:not(:first-child) {
-  background-color: #f8f9fa !important;
-  font-weight: 700 !important;
-  color: #1e3a8a !important;
+.berth-allocation-page .ag-row-group .ag-cell {
+  background-color: #1e3a8a !important;
+  color: #ffffff !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+  font-weight: bold !important;
 }
 
 .berth-allocation-page .ag-theme-alpine .ag-row-odd,

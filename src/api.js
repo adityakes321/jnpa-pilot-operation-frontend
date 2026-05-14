@@ -1,6 +1,9 @@
 import axios from "axios";
 
 function getBaseUrl() {
+  // To use LIVE production data, uncomment the line below:
+  // return "https://ntcpwcit.in/pilot-card-jnpa/v2";
+
   const { hostname } = window.location;
   const environments = {
     dev: { host: "localhost", baseUrl: "http://localhost:30000" },
@@ -56,6 +59,7 @@ const api = {
   deleteBerthVessel: (id, config) => http.post("/deleteBerthVessel", { id }, config),
   getBerthStatus: (config) => http.get("/getBerthStatus", config),
   getBerthPlan: (config) => http.get("/getBerthPlan", config),
+  getAllBerth: (config) => http.get("/getAllBerth", config),
   getUserData: (config) => http.get("/user-GetUserReportData", config),
 };
 

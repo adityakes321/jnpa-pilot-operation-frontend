@@ -116,6 +116,15 @@ function parseSlashDateTimeToIso(text) {
   return `${yyyy}-${mm.padStart(2, "0")}-${dd.padStart(2, "0")}T${hh}:${min}`;
 }
 
+function formatIsoToSlashDateTime(iso) {
+  if (!iso) return "";
+  const [datePart, timePart] = iso.split("T");
+  if (!datePart) return "";
+  const [yyyy, mm, dd] = datePart.split("-");
+  const [hh, min] = timePart ? timePart.split(":") : ["00", "00"];
+  return `${dd}/${mm}/${yyyy} ${hh}:${min}`;
+}
+
 function BerthNameCell(props) {
   const { data, value, onDeleteRow } = props;
   if (data.isGroup) {
@@ -241,6 +250,9 @@ export default function BerthAllocationPage() {
     position: "",
     side: "",
     readinessTime: "",
+    allocatedPilots: "",
+    allocatedTugs: "",
+    allocatedLaunch: "",
   });
 
   const [timeModalOpen, setTimeModalOpen] = useState(false);
@@ -345,6 +357,9 @@ export default function BerthAllocationPage() {
         position: o.berthVesselPosition || "",
         side: o.berthReqSide || "",
         readinessTime: o.vesselReadinessTime ? parseSlashDateTimeToIso(o.vesselReadinessTime) : "",
+        allocatedPilots: o.vessel_at_berth_alloc_pilots_names || "",
+        allocatedTugs: o.vessel_at_berth_alloc_tugs_names || "",
+        allocatedLaunch: o.vessel_at_berth_alloc_launches_names || "",
       });
     } else {
       setActiveRow({ ...row, colId: "nextVessel" });
@@ -357,6 +372,9 @@ export default function BerthAllocationPage() {
         position: o.nextVesselPosition || "",
         side: o.nextReqSide || "",
         readinessTime: o.nextVesselReadinessTime ? parseSlashDateTimeToIso(o.nextVesselReadinessTime) : "",
+        allocatedPilots: o.next_vessel_alloc_pilots_names || "",
+        allocatedTugs: o.next_vessel_alloc_tugs_names || "",
+        allocatedLaunch: o.next_vessel_alloc_launches_names || "",
       });
     }
     setVesselModalOpen(true);
@@ -392,7 +410,7 @@ export default function BerthAllocationPage() {
             berthVesselPosition: vesselForm.position,
             berthAdjDir: vesselForm.adjSide,
             berthAdjDetail: vesselForm.adjDetails,
-            vesselReadinessTime: vesselForm.readinessTime,
+            vesselReadinessTime: formatIsoToSlashDateTime(vesselForm.readinessTime),
           }
         : {
             field: "nextVesselData",
@@ -406,7 +424,7 @@ export default function BerthAllocationPage() {
             nextVesselPosition: vesselForm.position,
             nextAdjDir: vesselForm.adjSide,
             nextAdjDetail: vesselForm.adjDetails,
-            nextVesselReadinessTime: vesselForm.readinessTime,
+            nextVesselReadinessTime: formatIsoToSlashDateTime(vesselForm.readinessTime),
           };
     try {
       const res = await api.saveBerthPlanStatus(payload);
@@ -678,71 +696,159 @@ export default function BerthAllocationPage() {
 
       {vesselModalOpen ? (
         <div className="modal fade show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)", zIndex: 1050 }} role="dialog" aria-modal="true">
-          <div className="modal-dialog modal-lg">
+          <div className="modal-dialog modal-lg modal-xl">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">
-                  {activeRow?.berth} | Update Vessel Info
+                <h5 className="modal-title" id="vesselModalLabel">
+                  {activeRow?.colId === "vesselAtBerth" ? "Edit Vessel" : "Edit Next Vessel"}
                 </h5>
                 <button type="button" className="btn-close" aria-label="Close" onClick={() => setVesselModalOpen(false)} />
               </div>
               <div className="modal-body">
-                <div className="row g-3">
-                  <div className="col-md-12">
-                    <label className="form-label fw-bold">Select Vessel</label>
-                    <Select
-                      options={vesselSelectOptions}
-                      value={vesselSelectOptions.find((o) => o.value === vesselForm.selectedVia) || null}
-                      onChange={(opt) => setVesselForm((f) => ({ ...f, selectedVia: opt ? opt.value : "" }))}
-                      placeholder="Search vessel..."
-                      isClearable
-                    />
+                <div className="row">
+                  {/* Left Column: Vessel Selection and Details */}
+                  <div className="col-12 col-lg-6 mb-4 mb-lg-0 pe-lg-3 border-end">
+                    <div className="mb-3">
+                      <label className="form-label fw-bold">Select Vessel:</label>
+                      <Select
+                        options={vesselSelectOptions}
+                        value={vesselSelectOptions.find((o) => o.value === vesselForm.selectedVia) || null}
+                        onChange={(opt) => setVesselForm((f) => ({ ...f, selectedVia: opt ? opt.value : "" }))}
+                        placeholder="-- Select Vessel --"
+                        isClearable
+                      />
+                    </div>
+
+                    <div className="row mb-3">
+                      <div className="col-12 col-sm-6 mb-2">
+                        <label className="form-label fw-bold">Forward Draft:</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Enter Forward Draft"
+                          value={vesselForm.forwardDraft}
+                          onChange={(e) => setVesselForm((f) => ({ ...f, forwardDraft: e.target.value }))}
+                        />
+                      </div>
+                      <div className="col-12 col-sm-6 mb-2">
+                        <label className="form-label fw-bold">After Draft:</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Enter After Draft"
+                          value={vesselForm.afterDraft}
+                          onChange={(e) => setVesselForm((f) => ({ ...f, afterDraft: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="row mb-3">
+                      <div className="col-12 col-sm-6 mb-2">
+                        <label className="form-label fw-bold">Adjustments:</label>
+                        <select
+                          className="form-select"
+                          value={vesselForm.adjSide}
+                          onChange={(e) => setVesselForm((f) => ({ ...f, adjSide: e.target.value }))}
+                        >
+                          <option value="">N/A</option>
+                          <option value="N">N (North)</option>
+                          <option value="S">S (South)</option>
+                        </select>
+                      </div>
+                      <div className="col-12 col-sm-6 mb-2">
+                        <label className="form-label fw-bold">Adjustments Details:</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Enter Details"
+                          value={vesselForm.adjDetails}
+                          onChange={(e) => setVesselForm((f) => ({ ...f, adjDetails: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="row mb-3">
+                      <div className="col-12 col-sm-6 mb-2">
+                        <label className="form-label fw-bold">Position:</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Required Position"
+                          value={vesselForm.position}
+                          onChange={(e) => setVesselForm((f) => ({ ...f, position: e.target.value }))}
+                        />
+                      </div>
+                      <div className="col-12 col-sm-6 mb-2">
+                        <label className="form-label fw-bold">Side:</label>
+                        <select
+                          className="form-select"
+                          value={vesselForm.side}
+                          onChange={(e) => setVesselForm((f) => ({ ...f, side: e.target.value }))}
+                        >
+                          <option value="">--Select Side--</option>
+                          <option value="As Any Side">As Any Side</option>
+                          <option value="P/S">P/S</option>
+                          <option value="S/S">S/S</option>
+                        </select>
+                      </div>
+                    </div>
                   </div>
-                  <div className="col-md-6">
-                    <label className="form-label fw-bold">Forward Draft</label>
-                    <input type="text" className="form-control" value={vesselForm.forwardDraft} onChange={(e) => setVesselForm((f) => ({ ...f, forwardDraft: e.target.value }))} />
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label fw-bold">After Draft</label>
-                    <input type="text" className="form-control" value={vesselForm.afterDraft} onChange={(e) => setVesselForm((f) => ({ ...f, afterDraft: e.target.value }))} />
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label fw-bold">Adjustment Side</label>
-                    <select className="form-select" value={vesselForm.adjSide} onChange={(e) => setVesselForm((f) => ({ ...f, adjSide: e.target.value }))}>
-                      <option value="">--Select--</option>
-                      <option value="N">North (N)</option>
-                      <option value="S">South (S)</option>
-                    </select>
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label fw-bold">Adjustment Details</label>
-                    <input type="text" className="form-control" value={vesselForm.adjDetails} onChange={(e) => setVesselForm((f) => ({ ...f, adjDetails: e.target.value }))} />
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label fw-bold">Position</label>
-                    <input type="text" className="form-control" value={vesselForm.position} onChange={(e) => setVesselForm((f) => ({ ...f, position: e.target.value }))} />
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label fw-bold">Side</label>
-                    <select className="form-select" value={vesselForm.side} onChange={(e) => setVesselForm((f) => ({ ...f, side: e.target.value }))}>
-                      <option value="">--Select--</option>
-                      <option value="P/S">P/S</option>
-                      <option value="S/S">S/S</option>
-                      <option value="As Any Side">As Any Side</option>
-                    </select>
-                  </div>
-                  <div className="col-md-12">
-                    <label className="form-label fw-bold">Readiness Time</label>
-                    <input type="datetime-local" className="form-control" value={vesselForm.readinessTime} onChange={(e) => setVesselForm((f) => ({ ...f, readinessTime: e.target.value }))} />
+
+                  {/* Right Column: Allocation Details */}
+                  <div className="col-12 col-lg-6 ps-lg-3">
+                    <div className="mb-3">
+                      <label className="form-label fw-bold">
+                        Vessel Readiness Time: <span className="text-xxs text-muted">(Pilot Pick-up Time)</span>
+                      </label>
+                      <input
+                        type="datetime-local"
+                        className="form-control"
+                        value={vesselForm.readinessTime}
+                        onChange={(e) => setVesselForm((f) => ({ ...f, readinessTime: e.target.value }))}
+                      />
+                    </div>
+
+                    <div className="row mb-3">
+                      <div className="col-12 mb-2">
+                        <label className="form-label fw-bold">Allocated Pilots:</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Allocated Pilots"
+                          value={vesselForm.allocatedPilots}
+                          onChange={(e) => setVesselForm((f) => ({ ...f, allocatedPilots: e.target.value }))}
+                        />
+                      </div>
+                      <div className="col-12 mb-2">
+                        <label className="form-label fw-bold">Allocated Tugs:</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Allocated Tugs"
+                          value={vesselForm.allocatedTugs}
+                          onChange={(e) => setVesselForm((f) => ({ ...f, allocatedTugs: e.target.value }))}
+                        />
+                      </div>
+                      <div className="col-12 mb-2">
+                        <label className="form-label fw-bold">Allocated Launch:</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Allocated Launch"
+                          value={vesselForm.allocatedLaunch}
+                          onChange={(e) => setVesselForm((f) => ({ ...f, allocatedLaunch: e.target.value }))}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setVesselModalOpen(false)}>
+                <button type="button" className="btn btn-danger mb-0" onClick={() => setVesselModalOpen(false)}>
                   Cancel
                 </button>
-                <button type="button" className="btn btn-primary" onClick={saveVesselModal}>
-                  Save Changes
+                <button type="button" className="btn btn-primary mb-0" onClick={saveVesselModal}>
+                  Save
                 </button>
               </div>
             </div>
