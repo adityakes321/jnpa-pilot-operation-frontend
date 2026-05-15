@@ -1,23 +1,38 @@
 .berth-allocation-page .main-content {
-  margin-top: 100px;
+  margin-top: 80px;
   padding: 20px;
   display: block;
   width: 100%;
+  background: #ffffff;
 }
 
-.berth-allocation-page .container-fluid {
+.berth-allocation-page .navbar {
+  border-bottom: 3px solid #f59e0b !important;
+}
+
+.berth-allocation-page .header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.berth-allocation-page .header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.berth-allocation-page .main-content .container-fluid {
   width: 100% !important;
-  padding-left: 15px !important;
-  padding-right: 15px !important;
+  padding-left: 24px !important;
+  padding-right: 24px !important;
   display: block !important;
-  flex-direction: column !important;
 }
 
 .berth-allocation-page .grid-container {
   background: #ffffff;
-  border-radius: 12px;
-  padding: 15px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   width: 100% !important;
   box-sizing: border-box;
   display: block;
@@ -44,7 +59,8 @@
 }
 
 .berth-allocation-page .ag-root-wrapper {
-  border-radius: 10px;
+  border: none !important;
+  border-radius: 0;
 }
 
 .berth-allocation-page .ag-header-cell {

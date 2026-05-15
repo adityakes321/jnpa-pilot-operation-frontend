@@ -619,50 +619,50 @@ export default function BerthAllocationPage() {
   };
 
   return (
-    <div className="d-flex flex-column min-vh-100 bg-light berth-allocation-page">
-      <header className="bg-white shadow-sm">
-        <Navbar />
+    <div className="d-flex flex-column min-vh-100 bg-white berth-allocation-page">
+      <header className="header">
+        <div id="top-navbar">
+          <Navbar />
+        </div>
       </header>
 
       <main className="flex-grow-1 p-4 main-content">
         <div className="container-fluid">
-          <div className="row align-items-center mb-3">
-            <div className="col-lg-6 col-md-4 d-flex align-items-center">
+          <div className="header-section d-flex flex-nowrap align-items-center justify-content-between mb-3">
+            <div className="d-flex align-items-center flex-shrink-0">
               <button type="button" className="btn btn-sm btn-outline-primary p-2 mb-0 me-2" title="Go Back" onClick={() => navigate(-1)}>
                 <i className="fas fa-arrow-left" />
               </button>
               <h5 className="mb-0 text-warning fw-bold animate__animated animate__bounceInDown">Berth Allocation</h5>
             </div>
-            <div className="col-lg-6 col-md-8">
-              <div className="d-flex align-items-center justify-content-end gap-3">
-                <div style={{ width: "250px" }}>
-                  <div className="position-relative">
-                    <input type="text" className="form-control search-input" placeholder="Search" value={search} onChange={onSearchChange} />
-                    <i
-                      className="fas fa-search search-icon"
-                      id="searchIcon"
-                    />
-                  </div>
+            <div className="d-flex align-items-center gap-3 flex-grow-1 justify-content-end ms-3">
+              <div style={{ flex: "1 1 auto", maxWidth: "450px", minWidth: "150px" }}>
+                <div className="position-relative">
+                  <input type="text" className="form-control search-input" placeholder="Search" value={search} onChange={onSearchChange} />
+                  <i
+                    className="fas fa-search search-icon"
+                    id="searchIcon"
+                  />
                 </div>
-                <div className="d-flex gap-2 border-start ps-3">
-                  <div className="icon-box" title="Refresh Data" onClick={() => loadData(true)} role="button" tabIndex={0} onKeyDown={(e) => e.key === "Enter" && loadData(true)}>
-                    <i className="fas fa-sync-alt" />
-                  </div>
-                  <div className="icon-box" title="Export to Excel" onClick={exportExcel} role="button" tabIndex={0} onKeyDown={(e) => e.key === "Enter" && exportExcel()}>
-                    <i className="fas fa-file-export" />
-                  </div>
-                  <div
-                    className="icon-box"
-                    title="Add Berth Sharing"
-                    onClick={() => Swal.fire("Info", "Berth Sharing functionality is not implemented yet.", "info")}
-                    role="button"
-                    tabIndex={0}
-                  >
-                    <i className="fas fa-plus" />
-                  </div>
-                  <div className="icon-box" title="Settings" onClick={() => Swal.fire("Info", "Settings coming soon", "info")} role="button" tabIndex={0}>
-                    <i className="fas fa-cog" />
-                  </div>
+              </div>
+              <div className="d-flex gap-2 border-start ps-3">
+                <div className="icon-box" title="Refresh Data" onClick={() => loadData(true)} role="button" tabIndex={0} onKeyDown={(e) => e.key === "Enter" && loadData(true)}>
+                  <i className="fas fa-sync-alt" />
+                </div>
+                <div className="icon-box" title="Export to Excel" onClick={exportExcel} role="button" tabIndex={0} onKeyDown={(e) => e.key === "Enter" && exportExcel()}>
+                  <i className="fas fa-file-export" />
+                </div>
+                <div
+                  className="icon-box"
+                  title="Add Berth Sharing"
+                  onClick={() => Swal.fire("Info", "Berth Sharing functionality is not implemented yet.", "info")}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <i className="fas fa-plus" />
+                </div>
+                <div className="icon-box" title="Settings" onClick={() => Swal.fire("Info", "Settings coming soon", "info")} role="button" tabIndex={0}>
+                  <i className="fas fa-cog" />
                 </div>
               </div>
             </div>

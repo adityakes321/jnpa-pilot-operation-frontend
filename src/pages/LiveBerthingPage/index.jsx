@@ -24,7 +24,7 @@ export default function LiveBerthingPage() {
   const [headerHeight, setHeaderHeight] = useState(34);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showNotification, setShowNotification] = useState({ show: false, message: "" });
-  
+
   const leftGridRef = useRef(null);
   const rightGridRef = useRef(null);
   const previousDataMap = useRef(new Map());
@@ -39,7 +39,7 @@ export default function LiveBerthingPage() {
   const dateTimeValueFormatter = (params) => {
     if (!params.value || params.value.trim() === "") return "";
     const value = params.value.trim();
-    
+
     // Check for SQL datetime format (yyyy-mm-dd hh:mm:ss)
     const sqlRegex = /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})(?::(\d{2}))?$/;
     const match = value.match(sqlRegex);
@@ -103,21 +103,21 @@ export default function LiveBerthingPage() {
     let berthWidth, etcEtaWidth, sideWidth;
 
     if (zoom < 0.7) {
-      berthWidth = 130; etcEtaWidth = 150; sideWidth = 60;
+      berthWidth = 110; etcEtaWidth = 130; sideWidth = 75;
     } else if (zoom < 0.9) {
-      berthWidth = 130; etcEtaWidth = 140; sideWidth = 65;
+      berthWidth = 110; etcEtaWidth = 120; sideWidth = 80;
     } else if (effectiveWidth >= 3840) {
-      berthWidth = 200; etcEtaWidth = 240; sideWidth = 90;
+      berthWidth = 200; etcEtaWidth = 240; sideWidth = 130;
     } else if (effectiveWidth >= 2560) {
-      berthWidth = 180; etcEtaWidth = 180; sideWidth = 85;
+      berthWidth = 180; etcEtaWidth = 180; sideWidth = 110;
     } else if (effectiveWidth >= 1920) {
-      berthWidth = 180; etcEtaWidth = 160; sideWidth = 80;
+      berthWidth = 170; etcEtaWidth = 150; sideWidth = 100;
     } else if (effectiveWidth >= 1440) {
-      berthWidth = 150; etcEtaWidth = 140; sideWidth = 75;
+      berthWidth = 130; etcEtaWidth = 125; sideWidth = 85;
     } else if (effectiveWidth >= 1024) {
-      berthWidth = 100; etcEtaWidth = 110; sideWidth = 45;
+      berthWidth = 75; etcEtaWidth = 85; sideWidth = 65;
     } else {
-      berthWidth = 110; etcEtaWidth = 100; sideWidth = 65;
+      berthWidth = 80; etcEtaWidth = 90; sideWidth = 65;
     }
 
     return [
@@ -135,7 +135,7 @@ export default function LiveBerthingPage() {
         colId: "vessel",
         flex: 1,
         wrapText: true,
-        minWidth: 120,
+        minWidth: 80,
         cellStyle: { whiteSpace: "normal", lineHeight: "1.2" },
         valueFormatter: vesselValueFormatter,
         cellClass: (params) => {
@@ -158,7 +158,7 @@ export default function LiveBerthingPage() {
         field: "side",
         colId: "side",
         width: sideWidth,
-        cellStyle: { justifyContent: "center" },
+        cellStyle: { justifyContent: "center", whiteSpace: "nowrap" },
         valueFormatter: sideValueFormatter,
         cellClass: (params) => getCellUpdateClass(params, "side"),
       },
@@ -168,7 +168,7 @@ export default function LiveBerthingPage() {
         colId: "nextVessel",
         flex: 1,
         wrapText: true,
-        minWidth: 120,
+        minWidth: 80,
         cellStyle: { whiteSpace: "normal", lineHeight: "1.2" },
         valueFormatter: vesselValueFormatter,
         cellClass: (params) => getCellUpdateClass(params, "nextVessel"),
@@ -206,7 +206,7 @@ export default function LiveBerthingPage() {
 
     const wrapperRect = gridWrapper.getBoundingClientRect();
     const headerRect = gridHeader.getBoundingClientRect();
-    
+
     // Padding and margin approximations from CSS
     const availableHeight = wrapperRect.height - headerRect.height - 30 - 24 - hHeight - 10;
     let calcRowHeight = Math.floor(availableHeight / maxBerths);
@@ -317,7 +317,7 @@ export default function LiveBerthingPage() {
   useEffect(() => {
     loadData();
     const interval = setInterval(loadData, REFRESH_INTERVAL);
-    
+
     // 24-hour page refresh
     const PAGE_REFRESH_INTERVAL = 24 * 60 * 60 * 1000;
     const refreshTimeout = setTimeout(() => {
@@ -364,9 +364,9 @@ export default function LiveBerthingPage() {
     const handleFSChange = () => {
       const fs = !!document.fullscreenElement;
       setIsFullscreen(fs);
-      setShowNotification({ 
-        show: true, 
-        message: fs ? "Entered Fullscreen (Ctrl+Shift+F to exit)" : "Exited Fullscreen" 
+      setShowNotification({
+        show: true,
+        message: fs ? "Entered Fullscreen (Ctrl+Shift+F to exit)" : "Exited Fullscreen"
       });
       setTimeout(() => setShowNotification({ show: false, message: "" }), 2500);
     };
