@@ -290,6 +290,7 @@ export default function BerthAllocationPage() {
     };
   }, [loadData]);
 
+
   useEffect(() => {
     setRowData(flattenGridRows(rawBerths, expandedGroups));
   }, [rawBerths, expandedGroups]);

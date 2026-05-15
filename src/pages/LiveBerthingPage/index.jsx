@@ -22,6 +22,7 @@ export default function LiveBerthingPage() {
   const [counts, setCounts] = useState({ left: 0, right: 0 });
   const [rowHeight, setRowHeight] = useState(40);
   const [headerHeight, setHeaderHeight] = useState(34);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showNotification, setShowNotification] = useState({ show: false, message: "" });
 
@@ -100,25 +101,38 @@ export default function LiveBerthingPage() {
     const zoom = getBrowserZoomLevel();
     const effectiveWidth = screenWidth * zoom;
 
+    console.log(`📐 Screen: ${screenWidth}px | Zoom: ${(zoom * 100).toFixed(0)}% | Effective: ${effectiveWidth.toFixed(0)}px`);
+
     let berthWidth, etcEtaWidth, sideWidth;
+    let conditionApplied = "";
 
     if (zoom < 0.7) {
       berthWidth = 110; etcEtaWidth = 130; sideWidth = 75;
+      conditionApplied = "Very zoomed out";
     } else if (zoom < 0.9) {
       berthWidth = 110; etcEtaWidth = 120; sideWidth = 80;
+      conditionApplied = "Zoomed out";
     } else if (effectiveWidth >= 3840) {
       berthWidth = 200; etcEtaWidth = 240; sideWidth = 130;
+      conditionApplied = "4K screen";
     } else if (effectiveWidth >= 2560) {
       berthWidth = 180; etcEtaWidth = 180; sideWidth = 110;
+      conditionApplied = "2K screen";
     } else if (effectiveWidth >= 1920) {
       berthWidth = 170; etcEtaWidth = 150; sideWidth = 100;
+      conditionApplied = "Full HD screen";
     } else if (effectiveWidth >= 1440) {
       berthWidth = 130; etcEtaWidth = 125; sideWidth = 85;
+      conditionApplied = "1440p screen";
     } else if (effectiveWidth >= 1024) {
       berthWidth = 75; etcEtaWidth = 85; sideWidth = 65;
+      conditionApplied = "1024px screen";
     } else {
       berthWidth = 80; etcEtaWidth = 90; sideWidth = 65;
+      conditionApplied = "Mobile screen";
     }
+
+    console.log(`✅ Condition applied: ${conditionApplied} (Effective: ${effectiveWidth.toFixed(0)}px)`);
 
     return [
       {
@@ -184,11 +198,12 @@ export default function LiveBerthingPage() {
         cellClass: (params) => getCellUpdateClass(params, "eta"),
       },
     ];
-  }, []);
+  }, [windowWidth, getBrowserZoomLevel]);
 
   const calculateOptimalHeights = useCallback((leftCount, rightCount) => {
     const maxBerths = Math.max(leftCount, rightCount, 1);
     const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
     const zoom = window.devicePixelRatio || 1;
 
     let hHeight = 34;
@@ -221,7 +236,10 @@ export default function LiveBerthingPage() {
     else if (screenWidth >= 1024) { maxRH = 55; minRH = 25; }
     else { maxRH = 60; minRH = 45; }
 
-    setRowHeight(Math.max(minRH, Math.min(calcRowHeight, maxRH)));
+    const optimalRowHeight = Math.max(minRH, Math.min(calcRowHeight, maxRH));
+    setRowHeight(optimalRowHeight);
+
+    console.log(`📊 Row: ${optimalRowHeight}px | Berths: ${maxBerths} | Available: ${availableHeight.toFixed(0)}px | Zoom: ${(zoom * 100).toFixed(0)}%`);
   }, []);
 
   const loadData = useCallback(async () => {
@@ -315,12 +333,19 @@ export default function LiveBerthingPage() {
   }, [calculateOptimalHeights]);
 
   useEffect(() => {
+    console.log(`🖥️ Display: ${window.innerWidth}x${window.innerHeight}`);
     loadData();
-    const interval = setInterval(loadData, REFRESH_INTERVAL);
+    const interval = setInterval(() => {
+      // console.log('🔄 Auto-refreshing berthing data...');
+      loadData();
+    }, REFRESH_INTERVAL);
 
     // 24-hour page refresh
     const PAGE_REFRESH_INTERVAL = 24 * 60 * 60 * 1000;
+    console.log(`⏰ Page will refresh in 24 hours (${PAGE_REFRESH_INTERVAL / 1000 / 60 / 60} hours)`);
+
     const refreshTimeout = setTimeout(() => {
+      console.log('🔄 24-hour page refresh triggered');
       if (document.fullscreenElement) {
         document.exitFullscreen().then(() => {
           setTimeout(() => { window.location.reload(); }, 100);
@@ -338,6 +363,7 @@ export default function LiveBerthingPage() {
 
   useEffect(() => {
     const handleResize = () => {
+      setWindowWidth(window.innerWidth);
       calculateOptimalHeights(leftRowData.length, rightRowData.length);
     };
     window.addEventListener("resize", handleResize);
